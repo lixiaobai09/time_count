@@ -21,6 +21,7 @@ static struct timespec run_start;
 /* Set the process run on cpu */
 int set_cpu(int cpu) {
     cpu_set_t cpu_mask;
+    CPU_ZERO(&cpu_mask);
     CPU_SET(cpu, &cpu_mask);
     return sched_setaffinity(0, sizeof(cpu_set_t), &cpu_mask);
 }
