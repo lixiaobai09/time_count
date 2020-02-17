@@ -1,20 +1,12 @@
 #define _GNU_SOURCE
-#include <sys/times.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <time.h>
-#undef CLOCKS_PER_SEC
-#define CLOCKS_PER_SEC 1000000
-//# ifndef CLOCKS_PER_SEC
-//#define CLOCKS_PER_SEC sysconf(_SC_CLK_TCK)
-//#endif
-#define MINUS(res, a, b, attr) res.attr = a.attr - b.attr
 
 static uint64_t cycle_start;
-static struct tms clock_start;
-static clock_t real_clock_start;
+static clock_t clock_start;
 static struct timespec run_start;
 
 #include <sched.h>
@@ -66,38 +58,21 @@ double get_cycle_counter(int p) {
     return ret;
 }
 
-/* Get the tms a minus tms b */
-static inline struct tms minus(struct tms a, struct tms b) {
-    struct tms ret;
-    MINUS(ret, a, b, tms_utime);
-    MINUS(ret, a, b, tms_stime);
-    MINUS(ret, a, b, tms_cutime);
-    MINUS(ret, a, b, tms_cstime);
-    return ret;
-}
 
-/* Start count the cpu clock ticks */
+/* Start count the cpu real time */
 void start_clock_counter() {
-    real_clock_start = times(&clock_start);
+    clock_start = clock();
 }
 
-/* Get the cpu clock ticks from last start_clock_counter() running */
-struct tms get_clock_counter(int* real_time, int p) {
-    struct tms clock;
-    clock_t real_clock_end;
-    real_clock_end = times(&clock);
-    *real_time = real_clock_end - real_clock_start;
-    clock = minus(clock, clock_start);
+/* Get the real time from last start_clock_counter() running */
+double get_clock_counter(int p) {
+    clock_t clock_end = clock();
+    double ret = clock_end - clock_start;
+    ret = ret / CLOCKS_PER_SEC * 1000.0;
     if (p) {
-        int cps = CLOCKS_PER_SEC;
-        printf("This code segment runs %d ticks, %f ms user time.\n",
-                clock.tms_utime, clock.tms_utime / cps * 1000.0);
-        printf("This code segment runs %d ticks, %f ms system time.\n",
-                clock.tms_stime, clock.tms_stime / cps * 1000.0);
-        printf("This code segment runs %d ticks, %f ms real time.\n",
-                *real_time, (double) *real_time / cps  * 1000.0);
+        printf("This code segment runs %f ms real time.\n", ret);
     }
-    return clock;
+    return ret;
 }
 
 /* Start count the time from start to end on computer */

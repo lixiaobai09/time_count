@@ -3,12 +3,11 @@
 
 /* for program run time counter
  * @author: xiaobai
- * note: the function get_cycle_counter and get_run_counter
+ * @note: the function get_cycle_counter and get_run_counter
  *       include the process interrupt and sleep time;
  *
  *       the function get_clock_counter
- *       includes the all process time index, such as real time, user time, system time.
- *       but the unit tick for result is a little coarse, perhaps it is 10 ms per tick.
+ *       can get real cpu time with precision unit ms
  */
 
 /**
@@ -31,27 +30,19 @@ void start_cycle_counter();
 double get_cycle_counter(int p);
 
 /**
- * @breif Start count the cpu clock ticks
- * It is include user, system time and his children time
+ * @breif Start count the cpu real time
  */
 void start_clock_counter();
 
 /**
- * @breif Get the cpu clock ticks from last start_clock_counter() running
- * It is include user, system time and his children time
- * @param real_time Get the real time with unit ticks
+ * @breif Get the real time from last start_clock_counter() running
  * @param p If print the result information
  *          0 not print, 1 print
  *
  *
- * @return unit: ticks, include user, system and children time
- *         struct tms:
- *                      tms_utime:  the user time with unit ticks
- *                      tms_stime:  the system time with unit ticks
- *                      tms_cutime:  the children user time with unit ticks
- *                      tms_cstime:  the children system time with unit ticks
+ * @return unit: ms
  */
-struct tms get_clock_counter(int* real_time, int p);
+double get_clock_counter(int p);
 
 /**
  * @breif Start count the time from start to end on computer

@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/times.h>
 #include "time_cnt.h"
 #define N (10000000)
 #define OP *
@@ -32,7 +31,7 @@ int main(int argc, char** argv) {
         c[i] = a[i] OP b[i];
     }
     double res = get_cycle_counter(P);
-    printf("res: %f\n", res);
+    printf("Run %f cycles.\n", res);
     int len = (N > 10? 10 : N);
     for (int i = 0; i < len; ++i) {
         printf("%d ", c[i]);
@@ -44,11 +43,8 @@ int main(int argc, char** argv) {
     for (int i = 0; i < N; ++i) {
         c[i] = a[i] OP b[i];
     }
-    int real_time;
-    struct tms clock = get_clock_counter(&real_time, P);
-    printf("real_time: %d ticks, %f ms\n", real_time, (double)real_time/CLOCKS_PER_SEC_FOR_TIMES);
-    printf("user time: %d ticks, %f ms\n", clock.tms_utime, (double)clock.tms_utime/CLOCKS_PER_SEC_FOR_TIMES);
-    printf("system time: %d ticks, %f ms\n", clock.tms_stime, (double)clock.tms_stime/CLOCKS_PER_SEC_FOR_TIMES);
+    double real_time = get_clock_counter(P);
+    printf("Run %f ms. (real time)\n", real_time);
     for (int i = 0; i < len; ++i) {
         printf("%d ", c[i]);
     }
@@ -60,7 +56,7 @@ int main(int argc, char** argv) {
         c[i] = a[i] OP b[i];
     }
     res = get_run_counter(P);
-    printf("res: %f\n", res);
+    printf("Run %f ms\n", res);
     for (int i = 0; i < len; ++i) {
         printf("%d ", c[i]);
     }
